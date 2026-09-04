@@ -21,7 +21,7 @@
       <div class="stats">
         <div class="stat"><div class="num">25</div><div class="label">widgets</div></div>
         <div class="stat"><div class="num">16</div><div class="label">layout primitives</div></div>
-        <div class="stat"><div class="num">8</div><div class="label">full example apps</div></div>
+        <div class="stat"><div class="num">6</div><div class="label">full example apps</div></div>
       </div>
     </div>
   </div>
@@ -348,8 +348,14 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
     </div>
   </section>
 
-<section id="together">
-    <h2>Putting it together</h2>
+  <section id="examples">
+    <h2>Six full apps, start to finish</h2>
+    <p>The recipes above are the atoms. What follows are six complete, runnable <code>main()</code> functions built from them — copy one, <code>go run</code> it, and start swapping pieces out.</p>
+  </section>
+
+<section id="example-theming">
+    <h2>Example: component-level theming</h2>
+    <p class="example-lede">Clone the theme once per widget that needs to stand out, leave everything else on the shared theme — no global palette swap required.</p>
 
      <pre class="code">
          package main
@@ -455,8 +461,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
      </pre>
 </section>
 
-<section id="together">
-    <h2>Putting it together</h2>
+<section id="example-composition">
+    <h2>Example: composing layouts</h2>
+    <p class="example-lede">Grid, Split, Responsive, Stack, and Retained aren't separate tools — they nest. This one stacks all five into a dashboard that reflows when the terminal gets narrow.</p>
 
      <pre class="code">
          package main
@@ -529,8 +536,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
      </pre>
 </section>
 
-<section id="together">
-    <h2>Putting it together</h2>
+<section id="example-workspace">
+    <h2>Example: a workspace dashboard</h2>
+    <p class="example-lede">Tabs driving a task list, a schedule, a team board, and a 200-item virtualized queue — a productivity screen you'd actually keep open all day.</p>
 
      <pre class="code">
          package main
@@ -625,8 +633,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
      </pre>
 </section>
 
-<section id="together">
-    <h2>Putting it together</h2>
+<section id="example-trading-terminal">
+    <h2>Example: a live trading terminal</h2>
+    <p class="example-lede">Ticker, order book, sparkline, and a scrolling event log, all fed by one goroutine four times a second — the kind of screen ZeroTUI's diffing was built for.</p>
 
      <pre class="code">
          package main
@@ -733,8 +742,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 </section>
 
 
-<section id="together">
-    <h2>Putting it together</h2>
+<section id="example-panel-dashboard">
+    <h2>Example: closable, resizable panels</h2>
+    <p class="example-lede">Three independent panels — controls, live market data, and a 1,000-row table — each closable, each reopenable with a keypress, and resizable by dragging the split dividers.</p>
 
      <pre class="code">
      package main
@@ -1153,12 +1163,79 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 </section>
 
 
-<section id="together">
-    <h2>Putting it together</h2>
+<section id="example-ops-dashboard">
+    <h2>Example: a full operations dashboard</h2>
     <p>Six widgets, three nested <code>BorderedRounded</code> panels, a grid for the stat row, and a split down the middle — that's a full operations dashboard in around forty lines. Live CPU, revenue and order KPIs, a traffic sparkline, and a system-health list all sit inside one running app.</p>
 
      <pre class="code">
+package main
 
+import (
+	"fmt"
+
+	"github.com/ZeroGCDev/zerotui/app"
+	"github.com/ZeroGCDev/zerotui/layout"
+	"github.com/ZeroGCDev/zerotui/style"
+	"github.com/ZeroGCDev/zerotui/widget"
+)
+
+func main() {
+	theme := style.TokyoNightTheme()
+
+	live := widget.NewBadge("LIVE")
+	live.Positive = true
+
+	cpu := widget.NewStat("CPU", "42%")
+	cpu.Delta, cpu.Up = "-3%", false
+
+	revenue := widget.NewStat("Revenue", "$18.2k")
+	revenue.Delta, revenue.Up = "+12%", true
+
+	orders := widget.NewStat("Orders", "1,204")
+	orders.Delta, orders.Up = "+6%", true
+
+	statRow := layout.NewGrid(3, 1,
+		layout.Wrap(cpu),
+		layout.Wrap(revenue),
+		layout.Wrap(orders),
+	)
+
+	traffic := widget.NewSparkline(80)
+	for i := 0; i < 80; i++ {
+		traffic.Push(200 + float64(i%20)*15)
+	}
+
+	health := widget.NewList([]string{
+		"gateway     ● healthy",
+		"worker-01   ● healthy",
+		"worker-02   ● healthy",
+		"database    ● healthy",
+		"cache       ▲ degraded",
+	})
+
+	statsPanel := layout.BorderedRounded(
+		"KPIs", layout.Padding(statRow, 1, 1, 1, 1), nil,
+	)
+	trafficPanel := layout.BorderedRounded(
+		"TRAFFIC", layout.Wrap(traffic), nil,
+	)
+	healthPanel := layout.BorderedRounded(
+		"SYSTEM HEALTH", layout.Wrap(health),
+		func() bool { return health.IsFocused() },
+	)
+
+	left := layout.NewFlex(layout.Vertical,
+		layout.Fix(layout.Wrap(live), 1),
+		layout.Fix(statsPanel, 5),
+		layout.Flex1(trafficPanel),
+	)
+
+	root := layout.NewSplit(layout.Horizontal, left, healthPanel, 0.65)
+
+	if err := app.New(root, theme).Run(); err != nil {
+		fmt.Println(err)
+	}
+}
      </pre>
 </section>
 
