@@ -21,7 +21,7 @@
       <div class="stats">
         <div class="stat"><div class="num">25</div><div class="label">widgets</div></div>
         <div class="stat"><div class="num">16</div><div class="label">layout primitives</div></div>
-        <div class="stat"><div class="num">6</div><div class="label">full example apps</div></div>
+        <div class="stat"><div class="num">8</div><div class="label">full example apps</div></div>
       </div>
     </div>
   </div>
@@ -349,8 +349,8 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
   </section>
 
   <section id="examples">
-    <h2>Six full apps, start to finish</h2>
-    <p>The recipes above are the atoms. What follows are six complete, runnable <code>main()</code> functions built from them — copy one, <code>go run</code> it, and start swapping pieces out.</p>
+    <h2>Eight full apps, start to finish</h2>
+    <p>The recipes above are the atoms. What follows are eight complete, runnable <code>main()</code> functions built from them, each one actually run in a terminal and screenshotted — copy one, <code>go run</code> it, and start swapping pieces out.</p>
   </section>
 
 <section id="example-theming">
@@ -358,9 +358,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
     <p class="example-lede">Clone the theme once per widget that needs to stand out, leave everything else on the shared theme — no global palette swap required.</p>
 
      <pre class="code">
-         package main
+package main
 
-         import (
+import (
 	"fmt"
 	"sync/atomic"
 
@@ -368,12 +368,12 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 	"github.com/ZeroGCDev/zerotui/layout"
 	"github.com/ZeroGCDev/zerotui/style"
 	"github.com/ZeroGCDev/zerotui/widget"
-         )
+)
 
-         // This example is intentionally calm: one surface, one accent, and semantic
-         // status colors. It demonstrates component-level styling without turning the
-         // screen into a palette sampler.
-         func main() {
+// This example is intentionally calm: one surface, one accent, and semantic
+// status colors. It demonstrates component-level styling without turning the
+// screen into a palette sampler.
+func main() {
 	var enabled uint32
 	var level uint32 = 68
 
@@ -457,8 +457,8 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 		fmt.Println(err)
 	}
 }
-
      </pre>
+<figure class="example-shot"><img src="screenshots/showcase_controls.png" alt="Screenshot of the theming example running in a terminal" loading="lazy"><figcaption>Ran with `go run`: component-level theming, TokyoNight base.</figcaption></figure>
 </section>
 
 <section id="example-composition">
@@ -466,9 +466,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
     <p class="example-lede">Grid, Split, Responsive, Stack, and Retained aren't separate tools — they nest. This one stacks all five into a dashboard that reflows when the terminal gets narrow.</p>
 
      <pre class="code">
-         package main
+package main
 
-         import (
+import (
 	"fmt"
 
 	"github.com/ZeroGCDev/zerotui/app"
@@ -476,9 +476,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 	"github.com/ZeroGCDev/zerotui/layout"
 	"github.com/ZeroGCDev/zerotui/style"
 	"github.com/ZeroGCDev/zerotui/widget"
-         )
+)
 
-         func main() {
+func main() {
 	theme := style.DeepAbyssTheme()
 
 	card := func(title, body string) layout.Node {
@@ -532,8 +532,8 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 		fmt.Println(err)
 	}
 }
-
      </pre>
+<figure class="example-shot"><img src="screenshots/showcase_layouts.png" alt="Screenshot of the composition example running in a terminal" loading="lazy"><figcaption>Ran with `go run`: composed layout, expanded view, Deep Abyss theme.</figcaption></figure>
 </section>
 
 <section id="example-workspace">
@@ -541,18 +541,18 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
     <p class="example-lede">Tabs driving a task list, a schedule, a team board, and a 200-item virtualized queue — a productivity screen you'd actually keep open all day.</p>
 
      <pre class="code">
-         package main
+package main
 
-         import (
+import (
 	"fmt"
 
 	"github.com/ZeroGCDev/zerotui/app"
 	"github.com/ZeroGCDev/zerotui/layout"
 	"github.com/ZeroGCDev/zerotui/style"
 	"github.com/ZeroGCDev/zerotui/widget"
-         )
+)
 
-         func main() {
+func main() {
 	theme := style.TokyoNightTheme()
 
 	// Tabs are wired to the task list so this example demonstrates a real
@@ -629,8 +629,8 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 		fmt.Println(err)
 	}
 }
-
      </pre>
+<figure class="example-shot"><img src="screenshots/showcase_tasks.png" alt="Screenshot of the workspace example running in a terminal" loading="lazy"><figcaption>Ran with `go run`: tabbed workspace dashboard, Tokyo Night theme.</figcaption></figure>
 </section>
 
 <section id="example-trading-terminal">
@@ -638,9 +638,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
     <p class="example-lede">Ticker, order book, sparkline, and a scrolling event log, all fed by one goroutine four times a second — the kind of screen ZeroTUI's diffing was built for.</p>
 
      <pre class="code">
-         package main
+package main
 
-         import (
+import (
 	"fmt"
 	"sync/atomic"
 	"time"
@@ -650,9 +650,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 	"github.com/ZeroGCDev/zerotui/layout"
 	"github.com/ZeroGCDev/zerotui/style"
 	"github.com/ZeroGCDev/zerotui/widget"
-         )
+)
 
-         func main() {
+func main() {
 	theme := style.DraculaTheme()
 	var price uint64 = 102_450_000_000
 
@@ -737,8 +737,8 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 		fmt.Println(err)
 	}
 }
-
      </pre>
+<figure class="example-shot"><img src="screenshots/showcase_terminal.png" alt="Screenshot of the trading terminal example running in a terminal" loading="lazy"><figcaption>Ran with `go run`: Aurora Trading Terminal, Dracula theme.</figcaption></figure>
 </section>
 
 
@@ -747,9 +747,9 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
     <p class="example-lede">Three independent panels — controls, live market data, and a 1,000-row table — each closable, each reopenable with a keypress, and resizable by dragging the split dividers.</p>
 
      <pre class="code">
-     package main
+package main
 
-     import (
+import (
 	"fmt"
 	"math/rand"
 	"os"
@@ -762,11 +762,11 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 	"github.com/ZeroGCDev/zerotui/layout"
 	"github.com/ZeroGCDev/zerotui/style"
 	"github.com/ZeroGCDev/zerotui/widget"
-     )
+)
 
-     const PriceScale uint64 = 1_000_000_000
+const PriceScale uint64 = 1_000_000_000
 
-     func main() {
+func main() {
 	theme := style.NordTheme()
 	tokyoTheme := style.TokyoNightTheme()
 
@@ -1158,8 +1158,8 @@ retained.Invalidate() <span class="c">// call when geometry changes</span></pre>
 		os.Exit(1)
 	}
 }
-
      </pre>
+<figure class="example-shot"><img src="screenshots/showcase_dashboard.png" alt="Screenshot of the panel dashboard example running in a terminal" loading="lazy"><figcaption>Ran with `go run`: live market simulator with three closable panels, Nord theme.</figcaption></figure>
 </section>
 
 
@@ -1172,71 +1172,261 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ZeroGCDev/zerotui/app"
+	"github.com/ZeroGCDev/zerotui/color"
 	"github.com/ZeroGCDev/zerotui/layout"
 	"github.com/ZeroGCDev/zerotui/style"
 	"github.com/ZeroGCDev/zerotui/widget"
 )
 
 func main() {
-	theme := style.TokyoNightTheme()
+	theme := style.CatppuccinMochaTheme()
 
-	live := widget.NewBadge("LIVE")
-	live.Positive = true
+	revenue := widget.NewStat("REVENUE", "$128.4K")
+	revenue.Delta, revenue.Up = "+14.8%", true
+	orders := widget.NewStat("ORDERS", "2,481")
+	orders.Delta, orders.Up = "+8.2%", true
+	latency := widget.NewStat("LATENCY", "3.8 ms")
+	latency.Delta, latency.Down = "-0.6 ms", true
 
-	cpu := widget.NewStat("CPU", "42%")
-	cpu.Delta, cpu.Up = "-3%", false
+	cpu := widget.NewGauge("CPU")
+	cpu.ValueFn = func() float64 { return 0.42 + 0.08*float64(time.Now().Unix()%5)/4 }
+	cpu.WarnAt, cpu.DangerAt = .70, .90
 
-	revenue := widget.NewStat("Revenue", "$18.2k")
-	revenue.Delta, revenue.Up = "+12%", true
+	memory := widget.NewGradientBar(color.Cyan, color.Magenta, color.DimGray)
+	memory.Value = .68
 
-	orders := widget.NewStat("Orders", "1,204")
-	orders.Delta, orders.Up = "+6%", true
-
-	statRow := layout.NewGrid(3, 1,
-		layout.Wrap(cpu),
-		layout.Wrap(revenue),
-		layout.Wrap(orders),
-	)
-
-	traffic := widget.NewSparkline(80)
-	for i := 0; i < 80; i++ {
-		traffic.Push(200 + float64(i%20)*15)
+	traffic := widget.NewSparkline(40)
+	for i := 0; i < 40; i++ {
+		traffic.Push(40 + float64((i*i)%31))
 	}
 
 	health := widget.NewList([]string{
-		"gateway     ● healthy",
-		"worker-01   ● healthy",
-		"worker-02   ● healthy",
-		"database    ● healthy",
-		"cache       ▲ degraded",
+		"● API gateway       healthy",
+		"● Database          healthy",
+		"● Worker queue      healthy",
+		"● Object storage    healthy",
+		"● Search            healthy",
 	})
+	health.Background = &color.Panel
 
-	statsPanel := layout.BorderedRounded(
-		"KPIs", layout.Padding(statRow, 1, 1, 1, 1), nil,
-	)
-	trafficPanel := layout.BorderedRounded(
-		"TRAFFIC", layout.Wrap(traffic), nil,
-	)
-	healthPanel := layout.BorderedRounded(
-		"SYSTEM HEALTH", layout.Wrap(health),
-		func() bool { return health.IsFocused() },
+	badge := widget.NewBadge("LIVE")
+	badge.Positive = true
+
+	stats := layout.NewGrid(1, 3,
+		layout.Wrap(revenue), layout.Wrap(orders), layout.Wrap(latency),
 	)
 
-	left := layout.NewFlex(layout.Vertical,
-		layout.Fix(layout.Wrap(live), 1),
-		layout.Fix(statsPanel, 5),
-		layout.Flex1(trafficPanel),
-	)
+	top := layout.BorderedRounded("KEY METRICS", stats, nil)
+	chart := layout.BorderedRounded("TRAFFIC • LAST 40 SAMPLES", layout.NewFlex(
+		layout.Vertical,
+		layout.Fix(layout.Wrap(traffic), 4),
+		layout.Fix(layout.Wrap(memory), 1),
+	), nil)
 
-	root := layout.NewSplit(layout.Horizontal, left, healthPanel, 0.65)
+	right := layout.BorderedRounded("SYSTEM HEALTH", layout.NewFlex(
+		layout.Vertical,
+		layout.Fix(layout.Wrap(badge), 1),
+		layout.Flex1(layout.Wrap(health)),
+		layout.Fix(layout.Wrap(cpu), 1),
+	), nil)
+
+	body := layout.NewSplit(layout.Horizontal, chart, right, .68)
+	root := layout.NewFlex(layout.Vertical,
+		layout.Fix(layout.Wrap(widget.NewLabel("  NOVA • OPERATIONS")), 1),
+		layout.Fix(top, 4),
+		layout.Flex1(body),
+		layout.Fix(layout.Wrap(widget.NewLabel("  [q] quit")), 1),
+	)
 
 	if err := app.New(root, theme).Run(); err != nil {
 		fmt.Println(err)
 	}
 }
      </pre>
+<figure class="example-shot"><img src="screenshots/showcase_static.png" alt="Screenshot of the ops dashboard example running in a terminal" loading="lazy"><figcaption>Ran with `go run`: NOVA operations dashboard, Catppuccin Mocha theme.</figcaption></figure>
+</section>
+
+<section id="example-observability">
+    <h2>Example: an observability control room</h2>
+    <p class="example-lede">A log stream, service-health panel, and a Ctrl+K-style command palette that opens as an overlay on top of everything else — a screen an on-call engineer would actually want open.</p>
+
+     <pre class="code">
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/ZeroGCDev/zerotui/app"
+	"github.com/ZeroGCDev/zerotui/input"
+	"github.com/ZeroGCDev/zerotui/layout"
+	"github.com/ZeroGCDev/zerotui/style"
+	"github.com/ZeroGCDev/zerotui/widget"
+)
+
+func main() {
+	theme := style.NordTheme()
+
+	logs := widget.NewFastLogView(1000)
+	logs.FollowTail = true
+	for i := 1; i <= 18; i++ {
+		logs.Append(fmt.Sprintf("14:2%d:%02d  worker=%02d  request completed  status=200", i%6, i*3%60, i))
+	}
+
+	spinner := widget.NewSpinner("Deploying")
+	spinner.Frame = 3
+	gauge := widget.NewGauge("Queue depth")
+	gauge.Value = .63
+
+	var paletteVisible bool
+	palette := widget.NewCommandPalette([]widget.Command{
+		{Name: "Restart service", Key: "r"},
+		{Name: "Open metrics", Key: "m"},
+		{Name: "Clear logs", Key: "c"},
+		{Name: "Deploy latest", Key: "d"},
+	})
+
+	status := widget.NewStat("DEPLOYMENT", "RUNNING")
+	status.Delta = "2m 14s"
+
+	side := layout.BorderedRounded("SERVICE STATUS", layout.NewFlex(
+		layout.Vertical,
+		layout.Fix(layout.Wrap(widget.NewBadge("PRODUCTION")), 1),
+		layout.Fix(layout.Wrap(spinner), 2),
+		layout.Fix(layout.Wrap(status), 3),
+		layout.Fix(layout.Wrap(gauge), 2),
+		layout.Flex1(layout.Wrap(widget.NewLabel("API      healthy\nWORKER   healthy\nDB       healthy\nQUEUE    63%"))),
+	), nil)
+
+	main := layout.BorderedRounded("LIVE LOGS", layout.Wrap(logs), func() bool { return logs.IsFocused() })
+	paletteOverlay := layout.NewOverlay(
+		func() bool { return paletteVisible },
+		layout.Center(layout.Wrap(palette), .62, .72),
+	)
+	stack := layout.NewStack(main, paletteOverlay)
+
+	root := layout.NewFlex(layout.Vertical,
+		layout.Fix(layout.Wrap(widget.NewLabel("  OBSERVABILITY • CONTROL ROOM")), 1),
+		layout.Flex1(layout.NewSplit(layout.Horizontal, side, stack, .25)),
+		layout.Fix(layout.Wrap(widget.NewLabel("  Press [p] to focus command palette • [q] quit")), 1),
+	)
+
+	var a *app.App
+	palette.OnClose = func() {
+		paletteVisible = false
+		a.Relayout()
+	}
+	a = app.New(root, theme)
+	a.QuitKeys = []rune{'q'}
+	a.OnKey = func(k input.Key) bool {
+		if k.Type == input.KeyRune && k.Rune == 'p' {
+			paletteVisible = true
+			palette.SetQuery("")
+			a.Relayout()
+			a.Focus(palette)
+			return true
+		}
+		return false
+	}
+
+	go func() {
+		for i := 0; ; i++ {
+			time.Sleep(time.Second)
+			logs.Append(fmt.Sprintf("live event %04d  heartbeat ok", i))
+			a.InvalidateWidgets(logs)
+		}
+	}()
+
+	if err := a.Run(); err != nil {
+		fmt.Println(err)
+	}
+}
+     </pre>
+<figure class="example-shot"><img src="screenshots/showcase_observability.png" alt="Screenshot of the observability control room example running in a terminal" loading="lazy"><figcaption>Ran with `go run`: observability control room with command palette overlay, Nord theme.</figcaption></figure>
+</section>
+
+<section id="example-settings">
+    <h2>Example: a settings screen with live preview</h2>
+    <p class="example-lede">A form on one side, a live preview panel on the other — the preview widgets read the same state the form writes to, so nothing needs wiring beyond a shared variable.</p>
+
+     <pre class="code">
+package main
+
+import (
+	"fmt"
+	"sync/atomic"
+
+	"github.com/ZeroGCDev/zerotui/app"
+	"github.com/ZeroGCDev/zerotui/color"
+	"github.com/ZeroGCDev/zerotui/layout"
+	"github.com/ZeroGCDev/zerotui/style"
+	"github.com/ZeroGCDev/zerotui/widget"
+)
+
+func main() {
+	theme := style.VaporwaveTheme()
+	var notifications uint32 = 1
+	var volume uint32 = 72
+	var refresh uint32 = 30
+
+	toggle := widget.NewToggle("Desktop notifications", &notifications)
+	toggle.OnFlag, toggle.OffFlag = "ON", "OFF"
+
+	volumeSlider := widget.NewSlider("Volume", &volume, 0, 100, 1, widget.FormatInt("%"))
+	refreshSlider := widget.NewSlider("Refresh", &refresh, 5, 120, 5, widget.FormatInt("s"))
+
+	input := widget.NewTextInput("Workspace name")
+	input.Border = true
+	input.SetValue("production")
+
+	save := widget.NewButton("SAVE CHANGES", func() {})
+	reset := widget.NewButton("RESET", func() {
+		input.SetValue("production")
+		atomic.StoreUint32(&volume, 72)
+		atomic.StoreUint32(&refresh, 30)
+	})
+
+	preview := widget.NewStat("PREVIEW", "production")
+	preview.Delta = "READY"
+	capacity := widget.NewGradientBar(color.Cyan, color.Magenta, color.DimGray)
+	capacity.Value = .72
+
+	form := layout.Padding(layout.NewFlex(layout.Vertical,
+		layout.Fix(layout.Wrap(widget.NewLabel("WORKSPACE")), 1),
+		layout.Fix(layout.Wrap(input), 3),
+		layout.Fix(layout.Wrap(toggle), 1),
+		layout.Fix(layout.Wrap(volumeSlider), 1),
+		layout.Fix(layout.Wrap(refreshSlider), 1),
+		layout.Fix(layout.Wrap(widget.NewDivider(true)), 1),
+		layout.Fix(layout.Wrap(save), 1),
+		layout.Fix(layout.Wrap(reset), 1),
+	), 2, 1, 2, 1)
+
+	previewBox := layout.BorderedRounded("PREVIEW", layout.NewFlex(
+		layout.Vertical,
+		layout.Fix(layout.Wrap(widget.NewBadge("CUSTOM THEME")), 1),
+		layout.Fix(layout.Wrap(preview), 3),
+		layout.Fix(layout.Wrap(capacity), 1),
+		layout.Flex1(layout.Wrap(widget.NewLabel("Everything here is a normal widget.\nThe layout controls spacing, size and grouping."))),
+	), nil)
+
+	root := layout.Center(layout.NewSplit(layout.Horizontal,
+		layout.BorderedRounded("SETTINGS", form, func() bool {
+			return toggle.IsFocused() || volumeSlider.IsFocused() || refreshSlider.IsFocused() || input.IsFocused() || save.IsFocused() || reset.IsFocused()
+		}),
+		previewBox,
+		.52,
+	), .86, .82)
+
+	if err := app.New(root, theme).Run(); err != nil {
+		fmt.Println(err)
+	}
+}
+     </pre>
+<figure class="example-shot"><img src="screenshots/showcase_settings.png" alt="Screenshot of the settings screen example running in a terminal" loading="lazy"><figcaption>Ran with `go run`: settings form with live preview, Vaporwave theme.</figcaption></figure>
 </section>
 
   <footer>
