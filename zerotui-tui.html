@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZeroTUI — renders only what changed</title>
+<meta name="description" content="ZeroTUI is a zero-GC Go terminal rendering engine that diffs the screen instead of redrawing it, cutting memory traffic to 30 KB/s against Bubble Tea v2's 25 MB/s.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav"><a class="back-link" href="index.html">&larr; ZeroGCDev's blog</a></div>
+
+<header class="hero">
+  <div class="window">
+    <div class="window-bar"><span>posts / zerotui-tui</span><span>Sep 2026</span></div>
+    <div class="window-body">
+      <p class="prompt"><span class="sym">$</span> go get github.com/ZeroGCDev/zerotui<span class="cursor"></span></p>
+      <h1>ZeroTUI renders only what changed</h1>
+      <p class="sub">Most Go terminal frameworks redraw the entire grid to update a single digit. ZeroTUI diffs the screen instead, so trading desks and telemetry dashboards can push a thousand updates a second without a garbage-collection stutter.</p>
+      <div class="stats">
+        <div class="stat"><div class="num">30 KB/s</div><div class="label">memory traffic, vs. 25 MB/s for Bubble Tea v2</div></div>
+        <div class="stat"><div class="num">54.7 µs</div><div class="label">full-frame render time</div></div>
+        <div class="stat"><div class="num">99.9%</div><div class="label">less allocation than Bubble Tea v2</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section id="problem">
+    <p>Repainting an entire terminal grid because one character changed is like reprinting a whole newspaper page to fix a typo in a single headline. That's what most Go TUI frameworks do on every tick, and the constant reallocation is what triggers garbage-collection pauses — exactly the kind of stutter you can't afford on a live order book or a logs dashboard.</p>
+    <p class="dim">ZeroTUI was built to remove that cost for high-frequency workloads: trading desks, telemetry monitors, and anything else that redraws dozens of times a second.</p>
+  </section>
+
+  <section id="how-it-works">
+    <h2>How it works</h2>
+    <p>The mechanism is deliberately simple — three steps, run on every frame:</p>
+    <div class="steps">
+      <div class="step">
+        <div class="n">01</div>
+        <h3>Remember the last frame</h3>
+        <p>ZeroTUI keeps a copy of exactly what's currently on screen, cell by cell.</p>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <h3>Diff against the new one</h3>
+        <p>When fresh data arrives, it compares the new frame to the old one and finds only the cells that actually changed.</p>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <h3>Write just those cells</h3>
+        <p>Only the changed characters get sent to the terminal. Everything else is left alone — no reallocation, no garbage.</p>
+      </div>
+    </div>
+    <p class="dim" style="margin-top:22px;">Because it isn't generating temporary memory on every draw, ZeroTUI can stream live charts, fast-moving logs, or dense dashboards at 60 FPS without lag or memory spikes.</p>
+  </section>
+
+  <section id="benchmarks">
+    <h2>Benchmark: 1,000 ticks/sec of market data</h2>
+    <p>ZeroTUI, Bubble Tea v2, and Ratatui were run against the same simulated order-book feed. Here's how each held up.</p>
+    <div class="bench-cards">
+      <div class="bcard">
+        <h3>Bubble Tea v2</h3>
+        <div class="metric"><span class="k">Memory</span><span class="v">25 MB/s</span></div>
+        <div class="metric"><span class="k">Render</span><span class="v">~69.9 µs</span></div>
+        <div class="metric"><span class="k">Throughput</span><span class="v">~911 ticks/s</span></div>
+      </div>
+      <div class="bcard">
+        <h3>Ratatui</h3>
+        <div class="metric"><span class="k">Memory</span><span class="v">7.6 MB/s</span></div>
+        <div class="metric"><span class="k">Render</span><span class="v">~195.1 µs</span></div>
+        <div class="metric"><span class="k">Throughput</span><span class="v">1,000 ticks/s</span></div>
+      </div>
+      <div class="bcard win">
+        <h3>ZeroTUI</h3>
+        <div class="metric"><span class="k">Memory</span><span class="v">30–32 KB/s</span></div>
+        <div class="metric"><span class="k">Render</span><span class="v">~54.7 µs</span></div>
+        <div class="metric"><span class="k">Throughput</span><span class="v">~930 ticks/s</span></div>
+      </div>
+    </div>
+    <p class="bench-note">ZeroTUI cuts memory traffic by 99.9% and renders full frames 22% faster than Bubble Tea v2 and 72% faster than Ratatui — with zero GC pauses. Ratatui still edges out both on raw throughput, hitting the 1,000 ticks/sec target outright.</p>
+  </section>
+
+  <section id="where-to-use">
+    <h2>Where to use it</h2>
+    <div class="uses">
+      <div class="use-row">
+        <div class="name">Trading &amp; market dashboards</div>
+        <p class="desc">Real-time crypto tickers, live order books, and stock monitors that can't afford a dropped frame.</p>
+      </div>
+      <div class="use-row">
+        <div class="name">System &amp; telemetry viewers</div>
+        <p class="desc">Fast log viewers, server metrics, and CPU or memory monitors updating many times a second.</p>
+      </div>
+      <div class="use-row">
+        <div class="name">Ops &amp; risk tools</div>
+        <p class="desc">Dense dashboards built on huge tables or virtualized data lists.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="quickstart">
+    <h2>Getting started</h2>
+    <p>Every ZeroTUI app is built from three things: a <strong>widget</strong> that draws something, a <strong>layout node</strong> that decides where it goes, and an <code>app.App</code> that runs the whole thing. Widget is what — layout is where.</p>
+
+    <div class="qs-step">
+      <h3>Install</h3>
+      <pre class="code">go get github.com/ZeroGCDev/zerotui</pre>
+    </div>
+
+    <div class="qs-step">
+      <h3>Hello, ZeroTUI</h3>
+      <pre class="code">package main
+
+import (
+    "github.com/ZeroGCDev/zerotui/app"
+    "github.com/ZeroGCDev/zerotui/layout"
+    "github.com/ZeroGCDev/zerotui/style"
+    "github.com/ZeroGCDev/zerotui/widget"
+)
+
+func main() {
+    hello := widget.NewLabel("Hello, ZeroTUI!")
+    root := layout.Wrap(hello)
+
+    app.New(root, style.NordTheme()).Run()
+}</pre>
+    </div>
+
+    <div class="qs-step">
+      <h3>Add a button, wire it to a label</h3>
+      <p>The button's second argument is the function that runs when it's activated.</p>
+      <pre class="code">status := widget.NewLabel("Waiting...")
+button := widget.NewButton("CLICK ME", func() {
+    <span class="c">// runs when the button is activated</span>
+    status.SetText("Button was pressed!")
+})</pre>
+    </div>
+
+    <div class="qs-step">
+      <h3>Arrange with Flex</h3>
+      <p><code>layout.Vertical</code> stacks components top to bottom; <code>layout.Fix(..., 1)</code> gives each one row.</p>
+      <pre class="code">content := layout.NewFlex(
+    layout.Vertical,
+    layout.Fix(layout.Wrap(status), 1),
+    layout.Fix(layout.Wrap(button), 1),
+)</pre>
+      <p style="margin-top:14px;">You can also go horizontal — here the label takes a fixed width and the button fills the rest:</p>
+      <pre class="code">content := layout.NewFlex(
+    layout.Horizontal,
+    layout.Fix(layout.Wrap(status), 20),
+    layout.Flex1(layout.Wrap(button)),
+)</pre>
+    </div>
+
+    <div class="qs-step">
+      <h3>Add padding, then a panel</h3>
+      <pre class="code">content := layout.Padding(layout.Wrap(button), 2, 1, 2, 1)
+<span class="c">// left, top, right, bottom</span></pre>
+      <p style="margin-top:14px;">Wrap it in a rounded, titled panel and it stops being loose text floating on the terminal:</p>
+      <pre class="code">panel := layout.BorderedRounded("Status", content, nil)</pre>
+    </div>
+
+    <div class="qs-step">
+      <h3>Theme it</h3>
+      <p>Named colors, custom RGB, and full themes — Dracula, Catppuccin, Tokyo Night, Rosé Pine, and more — are all built in.</p>
+      <pre class="code">theme := style.NordTheme().Clone()
+theme.Selected.Bg = color.RGB(70, 120, 190)
+theme.Selected.Fg = color.White
+theme.Panel.Bg = color.RGB(30, 34, 42)
+app.New(root, theme).Run()</pre>
+    </div>
+
+    <div class="qs-step">
+      <h3>Put it together: a toggle that drives a label</h3>
+      <pre class="code">package main
+
+import (
+    "fmt"
+
+    "github.com/ZeroGCDev/zerotui/app"
+    "github.com/ZeroGCDev/zerotui/layout"
+    "github.com/ZeroGCDev/zerotui/style"
+    "github.com/ZeroGCDev/zerotui/widget"
+)
+
+func main() {
+    var enabled uint32
+
+    status := widget.NewLabel("Notifications are OFF")
+    toggle := widget.NewToggle("Notifications", &enabled)
+    button := widget.NewButton("SHOW STATUS", func() {
+        if enabled == 1 {
+            status.SetText("Notifications are ON")
+        } else {
+            status.SetText("Notifications are OFF")
+        }
+    })
+
+    content := layout.NewFlex(layout.Vertical,
+        layout.Fix(layout.Wrap(widget.NewLabel("ZeroTUI")), 1),
+        layout.Fix(layout.Wrap(toggle), 1),
+        layout.Fix(layout.Wrap(button), 1),
+        layout.Fix(layout.Wrap(status), 1),
+    )
+
+    padded := layout.Padding(content, 5, 2, 5, 2)
+
+    card := layout.BorderedRounded(
+        "Notifications",
+        padded,
+        func() bool { return true },
+    )
+
+    root := layout.FixedSize(card, 48, 13)
+
+    if err := app.New(root, style.TokyoNightTheme()).Run(); err != nil {
+        fmt.Println(err)
+    }
+}</pre>
+
+      <p style="margin-top:22px;">That's the actual 48×13 fixed-size card it renders. Press the button below to see what SHOW STATUS does to the label:</p>
+
+      <div class="mockup">
+        <div class="mockup-controls">
+          <button class="mockup-btn" id="toggleBtn" aria-pressed="false" type="button">SHOW STATUS</button>
+          <span class="mockup-state">notifications: <span id="stateWord">off</span></span>
+        </div>
+        <pre class="ascii" id="asciiPanel"></pre>
+      </div>
+    </div>
+
+    <p class="dim" style="margin-top:30px;">Start with <code>Label</code>, <code>Button</code>, <code>NewFlex</code>, <code>Padding</code>, and <code>Bordered</code>. Once those five click, the rest of ZeroTUI follows quickly.</p>
+  </section>
+
+  <section id="reference">
+    <h2>Quick reference</h2>
+    <div class="ref-grid">
+      <div class="ref-panel">
+        <h3>Widgets — what's displayed</h3>
+        <div class="ref-item"><span class="name">Label</span><span class="desc">text</span></div>
+        <div class="ref-item"><span class="name">Button</span><span class="desc">action</span></div>
+        <div class="ref-item"><span class="name">Toggle</span><span class="desc">on / off</span></div>
+        <div class="ref-item"><span class="name">Slider</span><span class="desc">choose a value</span></div>
+        <div class="ref-item"><span class="name">TextInput</span><span class="desc">enter text</span></div>
+        <div class="ref-item"><span class="name">Gauge</span><span class="desc">progress / usage</span></div>
+        <div class="ref-item"><span class="name">Sparkline</span><span class="desc">small graph</span></div>
+        <div class="ref-item"><span class="name">Table</span><span class="desc">data table</span></div>
+        <div class="ref-item"><span class="name">VirtualTable</span><span class="desc">huge data table</span></div>
+        <div class="ref-item"><span class="name">List</span><span class="desc">normal list</span></div>
+        <div class="ref-item"><span class="name">VirtualList</span><span class="desc">huge list</span></div>
+        <div class="ref-item"><span class="name">Tabs</span><span class="desc">switch sections</span></div>
+        <div class="ref-item"><span class="name">Stat</span><span class="desc">KPI</span></div>
+        <div class="ref-item"><span class="name">Badge</span><span class="desc">status</span></div>
+        <div class="ref-item"><span class="name">Spinner</span><span class="desc">loading</span></div>
+        <div class="ref-item"><span class="name">Divider</span><span class="desc">separator</span></div>
+        <div class="ref-item"><span class="name">Panel</span><span class="desc">single-widget container</span></div>
+        <div class="ref-item"><span class="name">FastLogView</span><span class="desc">logs</span></div>
+        <div class="ref-item"><span class="name">PriceTicker</span><span class="desc">live price</span></div>
+        <div class="ref-item"><span class="name">OrderBook</span><span class="desc">bids / asks</span></div>
+        <div class="ref-item"><span class="name">CommandPalette</span><span class="desc">commands</span></div>
+        <div class="ref-item"><span class="name">GradientBar</span><span class="desc">visual percentage</span></div>
+      </div>
+      <div class="ref-panel">
+        <h3>Layouts — where it goes</h3>
+        <div class="ref-item"><span class="name">Wrap</span><span class="desc">widget → layout</span></div>
+        <div class="ref-item"><span class="name">NewFlex</span><span class="desc">rows / columns</span></div>
+        <div class="ref-item"><span class="name">Fix</span><span class="desc">fixed space</span></div>
+        <div class="ref-item"><span class="name">Flex1 / FlexN</span><span class="desc">flexible space</span></div>
+        <div class="ref-item"><span class="name">Padding</span><span class="desc">space around content</span></div>
+        <div class="ref-item"><span class="name">FixedSize</span><span class="desc">fixed width / height</span></div>
+        <div class="ref-item"><span class="name">Bordered</span><span class="desc">titled border</span></div>
+        <div class="ref-item"><span class="name">BorderedRounded</span><span class="desc">rounded titled border</span></div>
+        <div class="ref-item"><span class="name">ClosableRounded</span><span class="desc">closable rounded panel</span></div>
+        <div class="ref-item"><span class="name">NewSplit</span><span class="desc">resizable panes</span></div>
+        <div class="ref-item"><span class="name">NewStack</span><span class="desc">layers</span></div>
+        <div class="ref-item"><span class="name">NewOverlay</span><span class="desc">conditional overlay</span></div>
+        <div class="ref-item"><span class="name">NewModal</span><span class="desc">centered dialog</span></div>
+        <div class="ref-item"><span class="name">Center</span><span class="desc">center content</span></div>
+        <div class="ref-item"><span class="name">Responsive</span><span class="desc">layouts by width</span></div>
+        <div class="ref-item"><span class="name">NewRetained</span><span class="desc">reuse stable layout</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="footer-prompt"><span class="sym">$</span> open github.com/ZeroGCDev/zerotui</p>
+    <div class="footer-links">
+      <a href="https://github.com/ZeroGCDev/zerotui">GitHub repo</a>
+      <a href="https://medium.com/@ZeroGCDev/zerotui-cookbook-recipes-for-building-beautiful-terminal-uis-570f07fad772">ZeroTUI cookbook</a>
+      <a href="https://www.linkedin.com/in/merupamganguly/">LinkedIn</a>
+      <a href="https://medium.com/@ZeroGCDev">More writing</a>
+    </div>
+    <p>Written by ZeroGCDev, a senior Golang engineer building high-performance systems, and the creator of ZeroTUI. Adapted from the original post on <a href="https://medium.com/@ZeroGCDev/how-a-new-tui-outperformed-bubble-tea-v2-and-even-ratatui-zerotui-370b70545d7f">Medium</a>.</p>
+  </footer>
+
+</main>
+
+<script>
+(function(){
+  var W = 44;
+  var enabled = false;
+  var btn = document.getElementById('toggleBtn');
+  var panel = document.getElementById('asciiPanel');
+  var stateWord = document.getElementById('stateWord');
+
+  function pad(s){
+    s = s || '';
+    if (s.length >= W) return s.slice(0, W);
+    return s + ' '.repeat(W - s.length);
+  }
+
+  function border(title){
+    var left = '─ ' + title + ' ';
+    var fill = W - left.length;
+    return '┌' + left + '─'.repeat(Math.max(fill, 0)) + '┐';
+  }
+
+  function render(){
+    var box = enabled ? '[x]' : '[ ]';
+    var status = enabled ? 'Notifications are ON' : 'Notifications are OFF';
+
+    var lines = [
+      border('Notifications'),
+      '│' + pad('') + '│',
+      '│' + pad(' ZeroTUI') + '│',
+      '│' + pad(' ' + box + ' Notifications') + '│',
+      '│' + pad(' [ SHOW STATUS ]') + '│',
+      '│<span class="hi">' + pad(' ' + status) + '</span>│',
+      '│' + pad('') + '│',
+      '└' + '─'.repeat(W) + '┘'
+    ];
+
+    panel.innerHTML = lines.join('\n');
+    stateWord.textContent = enabled ? 'on' : 'off';
+    btn.setAttribute('aria-pressed', String(enabled));
+  }
+
+  btn.addEventListener('click', function(){
+    enabled = !enabled;
+    render();
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
