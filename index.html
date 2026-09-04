@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZeroGCDev — blog</title>
-<meta name="description" content="Notes on building fast Go tools: terminal rendering, garbage collection, and low-level systems work from ZeroGCDev, creator of ZeroTUI.">
+<meta name="description" content="Notes on speed, systems, and software craft">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="hero">
   <div class="window">
-    <div class="window-bar"><span>zerogcdev.blog</span><span>1 post</span></div>
+    <div class="window-bar"><span>zerogcdev.blog</span><span>2 posts</span></div>
     <div class="window-body">
       <p class="prompt"><span class="sym">$</span> ls posts/<span class="cursor"></span></p>
       <h1>Notes on building fast Go tools</h1>
-      <p class="sub">Write-ups on terminal rendering, garbage collection, and squeezing real-time performance out of Go — starting with ZeroTUI, a zero-GC terminal rendering engine.</p>
+      <p class="sub">A technical blog on performance engineering, architecture, and building things that hold up under real load. Deep dives into performance, architecture, and the trade-offs behind real-world software</p>
     </div>
   </div>
 </header>
@@ -24,22 +24,30 @@
 
   <section id="posts">
     <h2>Posts</h2>
-    <a class="post-card" href="zerotui-tui.html">
+
+    <a class="post-card" href="zerotui-cookbook.html">
       <div class="post-card-top">
         <span class="post-chip">Latest</span>
+        <span class="post-date">Sep 2026</span>
+      </div>
+      <h3 class="post-title">The ZeroTUI Cookbook: Recipes for Building Beautiful Terminal UIs</h3>
+      <p class="post-excerpt">25 widgets, 16 layout primitives, and a full operations dashboard walked through end to end — practical recipes you can copy straight into a real app.</p>
+    </a>
+
+    <a class="post-card secondary" href="zerotui-tui.html">
+      <div class="post-card-top">
         <span class="post-date">Sep 2026</span>
       </div>
       <h3 class="post-title">How a New TUI Outperformed Bubble Tea v2 (and Even Ratatui): ZeroTUI</h3>
       <p class="post-excerpt">Diffing the terminal grid instead of redrawing it — 30 KB/s of memory traffic against Bubble Tea v2's 25 MB/s, with zero GC pauses.</p>
     </a>
-    <p class="dim small-note" style="margin-top:20px;">More posts land here as they're written — copy this card's markup for each new one and give it its own <code>.html</code> file.</p>
+
   </section>
 
   <footer>
     <p class="footer-prompt"><span class="sym">$</span> open github.com/ZeroGCDev/zerotui</p>
     <div class="footer-links">
       <a href="https://github.com/ZeroGCDev/zerotui">GitHub repo</a>
-      <a href="https://medium.com/@ZeroGCDev/zerotui-cookbook-recipes-for-building-beautiful-terminal-uis-570f07fad772">ZeroTUI cookbook</a>
       <a href="https://www.linkedin.com/in/merupamganguly/">LinkedIn</a>
       <a href="https://medium.com/@ZeroGCDev">More writing</a>
     </div>
